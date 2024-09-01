@@ -9,7 +9,6 @@
 - GLFW 및 GLEW 라이브러리
 
 ## 빌드 설정
-- Vcpkg를 이용해 GLEW와 GLFW를 라이브러리를 설치해야 합니다.
 - [ImGuiThread](ImGuiThread) 폴더 안에 [CMakeLists.txt](ImGuiThread/CMakeLists.txt) 파일을 이용해 쉽게 프로젝트에 통합할 수 있습니다.
 
 ## 프로젝트 구조 예시
@@ -17,6 +16,7 @@
 
 ## CMakeLists.txt
 - 여기에서는 프로젝트 이름을 `main`으로 설정합니다.(원하는 이름으로 변경 가능)
+- 프로젝트 CmakeLists.txt 파일에 다음 코드를 추가합니다.
 ```cmake
 cmake_minimum_required(VERSION 3.22)
 project(main)
