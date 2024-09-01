@@ -12,66 +12,22 @@
 - Vcpkg를 이용해 GLEW와 GLFW를 라이브러리를 설치해야 합니다.
 - [ImGuiThread](ImGuiThread) 폴더 안에 [CMakeLists.txt](ImGuiThread/CMakeLists.txt) 파일을 이용해 쉽게 프로젝트에 통합할 수 있습니다.
 
-### 의존성 설치
-```bash
-sudo apt update
-sudo apt install -y git curl zip unzip tar cmake build-essential pkg-config
-```
-
-### vcpkg 설치
-- 프로젝트 폴더 내에 vcpkg 폴더를 생성하고 vcpkg를 설치합니다.
-```bash
-git clone https://github.com/Microsoft/vcpkg.git vcpkg
-cd vcpkg
-./bootstrap-vcpkg.sh
-```
-
-### GLFW 설치
-```bash
-cd vcpkg
-./vcpkg install glfw3
-```
-
-### GLEW 설치
-```bash
-cd vcpkg
-./vcpkg install glew
-```
-
-### 빌드
-```bash
-mkdir build
-cd build
-cmake ..
-cmake --build .
-```
-
-### 실행
-```bash
-cd build
-./main
-```
+## 프로젝트 구조 예시
+![img.png](ImGuiThread/image/img.png)
 
 ## CMakeLists.txt
-- 프로젝트 이름은 `main`으로 설정합니다.
+- 여기에서는 프로젝트 이름을 `main`으로 설정합니다.(원하는 이름으로 변경 가능)
 ```cmake
 cmake_minimum_required(VERSION 3.22)
 project(main)
 
 set(CMAKE_CXX_STANDARD 23)
 
-# vcpkg 설정
-set(CMAKE_TOOLCHAIN_FILE ${CMAKE_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake)
-set(CMAKE_PREFIX_PATH ${CMAKE_SOURCE_DIR}/vcpkg/installed/x64-linux/share)
+add_subdirectory(ImGuiThread) # 서브 디렉토리 추가
 
-# 서브 디렉토리 ImGuiThread 추가
-add_subdirectory(ImGuiThread)
-
-# main.cpp 파일을 사용하여 실행 파일을 빌드
 add_executable(${PROJECT_NAME} main.cpp)
 
-# 실행 파일과 정적 라이브러리를 링크
-target_link_libraries(${PROJECT_NAME} PRIVATE ImGuiThread)
+target_link_libraries(${PROJECT_NAME} PRIVATE ImGuiThread) # ImGuiThread 라이브러리 링크
 ```
 
 ## 기본 사용법
