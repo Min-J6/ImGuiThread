@@ -16,8 +16,8 @@
 #include "implot_internal.h"
 #include "ImageLoader.h"
 
-#define IMGUI_THREAD_IMAGE_PATH "../ImGuiThread/gura.jpeg"
-#define IMGUI_THREAD_FONT_PATH  "../ImGuiThread/gg sans Medium.ttf"
+#define IMGUI_THREAD_IMAGE_PATH "../ImGuiThread/image/gura.jpeg"
+#define IMGUI_THREAD_FONT_PATH  "../ImGuiThread/font/gg sans Medium.ttf"
 #define IMGUI_THREAD_FONT_SIZE  21
 #define IMGUI_THREAD_SHOW_LOGO
 
