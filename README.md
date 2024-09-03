@@ -1,6 +1,5 @@
 # ImGuiThread
-`ImGuiThread` 클래스는 ImGui 창과 명령을 스레드 안전하게 관리할 수 있는 방법을 제공합니다.\
-이를 통해 애플리케이션의 어느 스레드에서든 ImGui 창을 생성하고 관리할 수 있습니다.
+C++ 프로젝트에서 간편하게 사용하기 위한 ImGui 라이브러리의 스레드 래퍼 클래스
 
 ## 필요 조건
 - C++17 이상
@@ -8,27 +7,25 @@
 - ImPlot 라이브러리 (플로팅 기능을 사용하는 경우)
 - GLFW 및 GLEW 라이브러리
 
-## 빌드 설정
-- [ImGuiThread](ImGuiThread) 폴더 안에 [CMakeLists.txt](ImGuiThread/CMakeLists.txt) 파일을 이용해 쉽게 프로젝트에 통합할 수 있습니다.
+## 지원 플랫폼
+- Windows: Visual Studio
+- Linux: GCC, Clang
 
-## 프로젝트 구조 예시
-![img.png](ImGuiThread/image/img.png)
-
-## CMakeLists.txt
-- 여기에서는 프로젝트 이름을 `main`으로 설정합니다.(원하는 이름으로 변경 가능)
+## 설치
+- ImGuiThread 폴더를 프로젝트 디렉토리에 복사합니다.
 - 프로젝트 CmakeLists.txt 파일에 다음 코드를 추가합니다.
-```cmake
-cmake_minimum_required(VERSION 3.22)
-project(main)
-
-set(CMAKE_CXX_STANDARD 23)
-
-add_subdirectory(ImGuiThread) # 서브 디렉토리 추가
-
-add_executable(${PROJECT_NAME} main.cpp)
-
-target_link_libraries(${PROJECT_NAME} PRIVATE ImGuiThread) # ImGuiThread 라이브러리 링크
-```
+    ```cmake
+    cmake_minimum_required(VERSION 3.22)
+    project(main)
+    
+    set(CMAKE_CXX_STANDARD 17)
+    
+    add_subdirectory(ImGuiThread) # 서브 디렉토리 추가
+    
+    add_executable(${PROJECT_NAME} main.cpp)
+    
+    target_link_libraries(${PROJECT_NAME} PRIVATE ImGuiThread) # ImGuiThread 라이브러리 링크
+    ```
 
 ## 기본 사용법
 
@@ -43,7 +40,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE ImGuiThread) # ImGuiThread 라이�
 ### 2. 기본적인 창 만들기
 - invoke 메서드를 사용하여 ImGui 창을 만들 수 있습니다.
 
-![img.png](ImGuiThread/img.png)
+![img.png](ImGuiThread/image/img.png)
 ### 예제 코드:
 ```c++
 int main()
@@ -65,7 +62,7 @@ int main()
 - 아래 예제에서는 `num` 변수를 슬라이더로 사용합니다.
 - 변수 조작 및 시각화를 위해 ImGui 라이브러리의 기능을 사용합니다.
 
-![img_1.png](ImGuiThread/img_1.png)
+![img_1.png](ImGuiThread/image/img_1.png)
 
 ### 예제 코드:
 ```c++

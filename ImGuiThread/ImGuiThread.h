@@ -20,6 +20,7 @@
 #define IMGUI_THREAD_FONT_PATH  "../ImGuiThread/font/gg sans Medium.ttf"
 #define IMGUI_THREAD_FONT_SIZE  21
 #define IMGUI_THREAD_SHOW_LOGO
+#include <Windows.h>  // Windows API 사용
 
 class ImGuiThread {
 public:
@@ -108,7 +109,7 @@ private:
 
                     // 윈도우 위치 계산 (우측 하단)
                     ImVec2 monitorSize(mode->width, mode->height);
-                    ImVec2 windowPos(monitorSize.x - (imageSize.x + 5), (monitorSize.y - 176));
+                    ImVec2 windowPos(monitorSize.x - (imageSize.x + 5), (monitorSize.y - 230));
 
                     // 윈도우 위치와 크기를 항상 설정
                     ImGui::SetNextWindowPos(windowPos, ImGuiCond_Always);
@@ -118,6 +119,7 @@ private:
                 ImGui::PushStyleVar(3, 0.0f); // No rounding
                 ImGui::PushStyleVar(4, 0.0f); // No border
                 ImGui::PushStyleVar(2, ImVec2(0.0f, 0.0f)); // No padding
+
 
                 if (ImGui::Begin("ImGuiThread", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings)) {
                     imageSize =  ImGui::GetContentRegionAvail();
@@ -158,8 +160,8 @@ private:
             return false;
         }
 
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
         GLFWwindow* rawWindow = glfwCreateWindow(1, 1, "Stable ImGui Thread Example", NULL, NULL);
