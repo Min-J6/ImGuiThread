@@ -40,14 +40,6 @@ public:
         });
     }
 
-    static void toggleVisibility() {
-        getInstance().isVisible = !getInstance().isVisible;
-    }
-
-    static bool isRunning() {
-        return getInstance().running;
-    }
-
 
 
 private:
@@ -57,8 +49,20 @@ private:
         }
     };
 
-    bool isVisible = false;
-    bool isImageButtonVisible = true;
+    static ImGuiThread& getInstance() {
+        static ImGuiThread instance;
+        return instance;
+    }
+
+
+    static void toggleVisibility() {
+        getInstance().isVisible = !getInstance().isVisible;
+    }
+
+    static bool isRunning() {
+        return getInstance().running;
+    }
+
 
     ImGuiThread() : running(false), frameCount(0) {}
     ~ImGuiThread() { stop(); }
@@ -66,10 +70,7 @@ private:
     ImGuiThread(const ImGuiThread&) = delete;
     ImGuiThread& operator=(const ImGuiThread&) = delete;
 
-    static ImGuiThread& getInstance() {
-        static ImGuiThread instance;
-        return instance;
-    }
+
 
     void addCommand(const std::string& id, std::function<void()> command) {
         static bool firstCommand = true;
@@ -131,6 +132,7 @@ private:
                 glfwSwapBuffers(window.get());
                 frameCount++;
             }
+
         }
         catch (const std::exception& e) {
             std::cerr << "Error in ImGuiThread: " << e.what() << std::endl;
@@ -140,15 +142,15 @@ private:
     }
 
     void renderImageButton() {
-        static ImageLoader imageLoader;
         static ImVec2 imageSize;
 
         // 이미지 크기 계산 (최초 1회)
         static bool first = true;
         if (first) {
             first = false;
-            imageLoader.loadImage(IMGUI_THREAD_IMAGE_PATH);
-            imageSize = ImVec2(imageLoader.getWidth(), imageLoader.getHeight());
+            imageLoader = std::make_unique<ImageLoader>();
+            imageLoader->loadImage(IMGUI_THREAD_IMAGE_PATH);
+            imageSize = ImVec2(imageLoader->getWidth(), imageLoader->getHeight());
 
             // 모니터 해상도 가져오기
             GLFWmonitor* primary = glfwGetPrimaryMonitor();
@@ -176,7 +178,7 @@ private:
 
         if (ImGui::Begin("ImGuiThread", &isImageButtonVisible, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize)) {
             imageSize = ImGui::GetContentRegionAvail();
-            if (ImGui::ImageButton((void*)(intptr_t)imageLoader.getTexture(), imageSize)) {
+            if (ImGui::ImageButton((void*)(intptr_t)imageLoader->getTexture(), imageSize)) {
                 toggleVisibility();
             }
         }
@@ -258,6 +260,7 @@ private:
     }
 
     void cleanup() {
+        imageLoader.reset();
         ImGui_ImplOpenGL3_Shutdown();
         ImGui_ImplGlfw_Shutdown();
         glfwTerminate();
@@ -283,6 +286,8 @@ private:
         void operator()(ImPlotContext* ctx) { ImPlot::DestroyContext(ctx); }
     };
 
+
+
     std::unique_ptr<GLFWwindow, GLFWwindowDeleter> window;
     std::unique_ptr<ImGuiContext, ImGuiContextDeleter> imguiContext;
     std::unique_ptr<ImPlotContext, ImPlotContextDeleter> implotContext;
@@ -292,4 +297,7 @@ private:
     std::mutex queueMutex;
     std::condition_variable queueCV;
     std::atomic<uint64_t> frameCount;
+    bool isVisible = false;
+    bool isImageButtonVisible = true;
+    std::unique_ptr<ImageLoader> imageLoader;
 };
