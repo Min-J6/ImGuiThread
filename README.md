@@ -40,6 +40,12 @@ cmake ..
 cmake --build .
 ```
 
+## 실행
+```bash
+cd build
+./main
+```
+
 ## 기본 사용법
 - 이미지 창을 클릭하면 Visible 변수가 토글됩니다.
 
