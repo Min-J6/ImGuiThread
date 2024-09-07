@@ -31,7 +31,17 @@ C++ 프로젝트에서 간편하게 사용하기 위한 ImGui 라이브러리의
   ![img.png](ImGuiThread/image/img.png)
 
 
+
+## 빌드
+```bash
+mkdir build
+cd build
+cmake ..
+cmake --build .
+```
+
 ## 기본 사용법
+- 이미지 창을 클릭하면 Visible 변수가 토글됩니다.
 
 ### 1. 헤더 포함하기
 

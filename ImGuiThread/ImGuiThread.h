@@ -16,15 +16,14 @@
 #include "implot_internal.h"
 #include "ImageLoader.h"
 
-#define IMGUI_THREAD_IMAGE_PATH "../ImGuiThread/image/gura.jpeg"
-#define IMGUI_THREAD_FONT_PATH  "../ImGuiThread/font/gg sans Medium.ttf"
+#define IMGUI_THREAD_IMAGE_PATH "gura.jpeg"
+#define IMGUI_THREAD_FONT_PATH  "gg sans Medium.ttf"
 #define IMGUI_THREAD_FONT_SIZE  21
 #define IMGUI_THREAD_SHOW_LOGO
-#include <Windows.h>  // Windows API 사용
 
 class ImGuiThread {
 public:
-    void static invoke(const std::string& id, std::function<void()> command) {
+    static void invoke(const std::string& id, std::function<void()> command) {
         getInstance().addCommand(id, command);
     }
 
@@ -39,6 +38,15 @@ public:
         });
     }
 
+    static void toggleVisibility() {
+        getInstance().isVisible = !getInstance().isVisible;
+    }
+
+    static bool isRunning() {
+        return getInstance().running;
+    }
+
+
 
 private:
     struct GLFWwindowDeleter {
@@ -46,6 +54,9 @@ private:
             glfwDestroyWindow(window);
         }
     };
+
+    bool isVisible = false;
+    bool isImageButtonVisible = true;
 
     ImGuiThread() : running(false), frameCount(0) {}
     ~ImGuiThread() { stop(); }
@@ -89,45 +100,16 @@ private:
                 ImGui_ImplGlfw_NewFrame();
                 ImGui::NewFrame();
 
-                executeCommands();
-
-#ifdef IMGUI_THREAD_SHOW_LOGO
-                static ImageLoader imageLoader;
-                static ImVec2 imageSize;
-
-                // 이미지 크기 계산
-                static bool first = true;
-                if (first) {
-                    first = false;
-
-                    imageLoader.loadImage(IMGUI_THREAD_IMAGE_PATH);
-
-                    imageSize = ImVec2(imageLoader.getWidth(), imageLoader.getHeight());
-                    // 모니터 해상도 가져오기
-                    GLFWmonitor* primary = glfwGetPrimaryMonitor();
-                    const GLFWvidmode* mode = glfwGetVideoMode(primary);
-
-                    // 윈도우 위치 계산 (우측 하단)
-                    ImVec2 monitorSize(mode->width, mode->height);
-                    ImVec2 windowPos(monitorSize.x - (imageSize.x + 5), (monitorSize.y - 230));
-
-                    // 윈도우 위치와 크기를 항상 설정
-                    ImGui::SetNextWindowPos(windowPos, ImGuiCond_Always);
-                    ImGui::SetNextWindowSize(imageSize, ImGuiCond_Always);
+                if (isVisible) {
+                    executeCommands();
                 }
 
-                ImGui::PushStyleVar(3, 0.0f); // No rounding
-                ImGui::PushStyleVar(4, 0.0f); // No border
-                ImGui::PushStyleVar(2, ImVec2(0.0f, 0.0f)); // No padding
+                renderImageButton();
 
-
-                if (ImGui::Begin("ImGuiThread", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings)) {
-                    imageSize =  ImGui::GetContentRegionAvail();
-                    ImGui::Image((void*)(intptr_t)imageLoader.getTexture(), imageSize);
+                if (!isImageButtonVisible) {
+                    running = false;  // 이미지 버튼 창이 닫히면 루프 종료
                 }
-                ImGui::End();
-                ImGui::PopStyleVar(3);
-#endif
+
                 ImGui::Render();
                 int display_w, display_h;
                 glfwGetFramebufferSize(window.get(), &display_w, &display_h);
@@ -153,6 +135,54 @@ private:
         }
 
         cleanup();
+    }
+
+    void renderImageButton() {
+        static ImageLoader imageLoader;
+        static ImVec2 imageSize;
+
+        // 이미지 크기 계산 (최초 1회)
+        static bool first = true;
+        if (first) {
+            first = false;
+            imageLoader.loadImage(IMGUI_THREAD_IMAGE_PATH);
+            imageSize = ImVec2(imageLoader.getWidth(), imageLoader.getHeight());
+
+            // 모니터 해상도 가져오기
+            GLFWmonitor* primary = glfwGetPrimaryMonitor();
+            const GLFWvidmode* mode = glfwGetVideoMode(primary);
+
+            // 윈도우 위치 계산 (우측 하단)
+            ImVec2 monitorSize(mode->width, mode->height);
+            ImVec2 windowPos(monitorSize.x - (imageSize.x + 5), (monitorSize.y - 230));
+
+            // 윈도우 위치와 크기를 항상 설정
+            ImGui::SetNextWindowPos(windowPos, ImGuiCond_Always);
+            ImGui::SetNextWindowSize(imageSize, ImGuiCond_Always);
+        }
+
+        // 창 스타일 설정
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+
+        // 버튼 스타일 설정
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.0f, 0.0f));
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+
+        if (ImGui::Begin("ImGuiThread", &isImageButtonVisible, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize)) {
+            imageSize = ImGui::GetContentRegionAvail();
+            if (ImGui::ImageButton((void*)(intptr_t)imageLoader.getTexture(), imageSize)) {
+                toggleVisibility();
+            }
+        }
+        ImGui::End();
+
+        // 스타일 복원
+        ImGui::PopStyleVar(4);
+        ImGui::PopStyleColor(3);
     }
 
     bool initializeGLFW() {
